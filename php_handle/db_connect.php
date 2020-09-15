@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$baza = "opravila";
+$baza = "evidenca";
 
 // objekt za novo povezavo
 $conn = new mysqli($servername, $username, $password, $baza);

@@ -25,12 +25,12 @@ $(document).ready(function(){
           url: "php_handle/prijavi.php",
           data:{username:username, password:password},
           success: function(data){
-            if(data == 5){
-              alert("uspesna prijava");
-            }else {
+            if (data == 1) {
+              window.location.href = 'evidenca/pregled.php';
+            } else {
               $("#username").css("border", "1px solid red");
               $("#password").css("border", "1px solid red");
-              $("#info").html("Uporabniško ime in geslo se ne ujemata!")
+              $("#info").html("Uporabniško ime in geslo se ne ujemata!");
             }
           }
       });
