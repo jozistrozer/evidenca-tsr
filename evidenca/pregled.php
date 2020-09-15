@@ -3,9 +3,13 @@ session_start();
 include('../php_handle/db_connect.php');
 $username = $_SESSION['username'];
 
-$ime = mysqli_query($conn, "SELECT ime FROM dijak WHERE username = '$username'");
+$osnovni_podatki = mysqli_query($conn, "SELECT d.ime, d.priimek, r.razred FROM dijak d INNER JOIN razred r ON d.razred_id=r.razred_id WHERE d.username='$username';");
 
-echo $username;
+while($vrstica = mysqli_fetch_assoc($osnovni_podatki)) {
+  $ime = $vrstica["ime"];
+  $priimek = $vrstica["priimek"];
+  $oddelek = $vrstica["razred"];
+}
 
  ?>
 <!DOCTYPE html>
@@ -40,7 +44,7 @@ echo $username;
         </ul>
 
         <ul class="nav navbar-nav" id="prijavljenNavbar">
-          <li><p><span style="font-weight: bold;">Prijavljen uporabnik: </span><?php echo "Janez Novak"; ?></p></li>
+          <li><p><span style="font-weight: bold;">Prijavljen uporabnik: </span><?php echo $ime . " " . $priimek; ?></p></li>
         </ul>
 
       </div>
@@ -48,8 +52,8 @@ echo $username;
   </head>
   <body>
     <p>Tukaj bojo vsi predmeti, podatki o dijaku, profesorju. Klik na predmet pokaže podrobnosti o predmetu in ocene.</p>
-    <h4><span style="font-weight: bold;">Status: </span>Dijak</h4>
-    <h4><span style="font-weight: bold;">Oddelek: </span>R-4.b</h4>
+    <h4><span style="font-weight: bold;">Status: </span><?php echo "testtesttesttest"; ?></h4>
+    <h4><span style="font-weight: bold;">Oddelek: </span><?php echo $oddelek; ?></h4>
 
     <table class="table">
       <thead>
