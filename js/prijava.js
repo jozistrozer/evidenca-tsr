@@ -25,7 +25,7 @@ $(document).ready(function(){
           url: "php_handle/prijavi.php",
           data:{username:username, password:password},
           success: function(data){
-            if(data == 1){
+            if(data == 5){
               alert("uspesna prijava");
             }else {
               $("#username").css("border", "1px solid red");

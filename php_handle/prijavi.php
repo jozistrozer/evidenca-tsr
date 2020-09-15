@@ -6,6 +6,8 @@ include("db_connect.php");
 $username = $_POST['username'];
 $password = $_POST['password'];
 
+echo $username;
+
 # sql poizvedba
 $sql = "SELECT * FROM uporabniki WHERE username='$username' AND password = PASSWORD('$password')";
 $detail = mysqli_num_rows(mysqli_query($conn, $sql));
@@ -16,8 +18,4 @@ if($detail == 1){
 }else{
   echo 0;
 }
-
-
-
-
  ?>

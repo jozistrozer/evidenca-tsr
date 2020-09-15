@@ -1,0 +1,23 @@
+.navbar{
+  margin-bottom: 0px;
+}
+
+#postavkeNavbar{
+  min-height: 0px;
+  background-color: #cccccc;
+  margin-bottom: 20px;
+}
+
+#postavkeList{
+  color: black;
+  float: left;
+}
+
+#prijavljenNavbar{
+  float: right;
+}
+
+#postavkeList, li{
+  margin-right: 25px;
+  margin-top: 5px;
+}
