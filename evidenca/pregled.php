@@ -2,13 +2,24 @@
 session_start();
 include('../php_handle/db_connect.php');
 $username = $_SESSION['username'];
+$vrsta_up = $_SESSION["vrsta_up"];
 
-$osnovni_podatki = mysqli_query($conn, "SELECT d.ime, d.priimek, r.razred FROM dijak d INNER JOIN razred r ON d.razred_id=r.razred_id WHERE d.username='$username';");
+if ($vrsta_up == "dijak") {
+    # DIJAK
+    $osnovni_podatki = mysqli_query($conn, "SELECT d.ime, d.priimek, r.razred FROM dijak d INNER JOIN razred r ON d.razred_id=r.razred_id WHERE d.username='$username';");
 
-while($vrstica = mysqli_fetch_assoc($osnovni_podatki)) {
-  $ime = $vrstica["ime"];
-  $priimek = $vrstica["priimek"];
-  $oddelek = $vrstica["razred"];
+    while($vrstica = mysqli_fetch_assoc($osnovni_podatki)) {
+      $ime = $vrstica["ime"];
+      $priimek = $vrstica["priimek"];
+      $oddelek = $vrstica["razred"];
+    }
+
+    $predmeti = mysqli_fetch_all(mysqli_query($conn, "SELECT DISTINCT p.kratica, pr.predmet_id FROM predmet p, dijak d, predmet_razred pr WHERE d.razred_id = (SELECT razred_id FROM dijak WHERE username='$username') AND pr.predmet_id = p.predmet_id"));
+} else if ($vrsta_up == "profesor") {
+    # PROFESOR
+    
+} else {
+    header("Location: ../index.html");
 }
 
  ?>
@@ -22,6 +33,7 @@ while($vrstica = mysqli_fetch_assoc($osnovni_podatki)) {
     <link rel="stylesheet" href="css/evidenca.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="js/odjava.js" charset="utf-8"></script>
     <title>Pregled</title>
     <div class="navbar navbar-inverse">
       <div class="container-fluid">
@@ -51,71 +63,55 @@ while($vrstica = mysqli_fetch_assoc($osnovni_podatki)) {
     </div>
   </head>
   <body>
-    <p>Tukaj bojo vsi predmeti, podatki o dijaku, profesorju. Klik na predmet pokaže podrobnosti o predmetu in ocene.</p>
-    <h4><span style="font-weight: bold;">Status: </span><?php echo "testtesttesttest"; ?></h4>
+    <h4><span style="font-weight: bold;">Status: </span><?php echo ucfirst($vrsta_up); ?></h4>
     <h4><span style="font-weight: bold;">Oddelek: </span><?php echo $oddelek; ?></h4>
 
-    <table class="table">
-      <thead>
-      <tr>
-        <th scope="col">Predmet</th>
-        <th scope="col">1. ocenjevalno obdobje</th>
-        <th scope="col">2. ocenjevalno obdobje</th>
-        <th scope="col">Zaključena ocena</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <th scope="row">MAT</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
-      <tr>
-        <th scope="row">SLO</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
-      <tr>
-        <th scope="row">ANG</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
-      <tr>
-        <th scope="row">FIZ</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
-      <tr>
-        <th scope="row">ŠVZ</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
-      <tr>
-        <th scope="row">ZGO</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
-      <tr>
-        <th scope="row">BIO</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
-      <tr>
-        <th scope="row">KEM</th>
-        <td>3, 5, 1</td>
-        <td>5, 4, 2</td>
-        <td> / </td>
-      </tr>
+      <?php
+        if ($vrsta_up == "dijak") {
+            echo "<table class='table'>";
+            echo "<thead>";
+            echo "<tr>";
+            echo "<th scope='col'>Predmet</th>";
+            echo "<th scope='col'>1. Ocenjevalno obdobje</th>";
+            echo "<th scope='col'>2. Ocenjevalno obdobje</th>";
+            echo "<th scope='col'>Zaključena ocena</th>";
+            echo "</tr>";
+            echo "</thead>";
+            echo "<tbody>";
+        for ($i = 0; $i < count($predmeti); $i++) {
+          echo "<tr>";
+          echo "<th scope='row'>" . $predmeti[$i][0] . "</th>";
+          $predmet_prvo = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 1");
 
-      </tbody>
-    </table>
+          $predmet_drugo = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 2");
+
+          $predmet_zakljucena = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 3");
+          # 1. OCENJEVALNO OBDOBJE
+          echo "<td>";
+          while($ocena = mysqli_fetch_assoc($predmet_prvo)){
+              echo $ocena["ocena"] . " ";
+          }
+          echo "</td>";
+          # 2. OCENJEVALNO OBDOBJE
+          echo "<td>";
+          while($ocena = mysqli_fetch_assoc($predmet_drugo)){
+              echo $ocena["ocena"] . " ";
+          }
+          echo "</td>";
+          # ZAKLJUCENA
+          echo "<td>";
+          while($ocena = mysqli_fetch_assoc($predmet_zakljucena)){
+              echo $ocena["ocena"] . " ";
+          }
+          echo "</td>";
+          echo "</tr>";
+          
+        } 
+        echo "</tbody>";
+        echo "</table>";
+    }
+        
+      ?>
 
   </body>
   <footer>
