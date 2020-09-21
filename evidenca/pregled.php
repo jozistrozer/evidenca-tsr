@@ -111,6 +111,9 @@ if ($vrsta_up == "dijak") {
           echo "<td>";
           while($ocena = mysqli_fetch_assoc($predmet_drugo)){
               $ocena_temp = $ocena["ocena"];
+              $vrstaOcene_temp = $ocena["vrsta_ocene"];
+              $komentar_temp = $ocena["komentar"];
+              
               echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b> Matic, SQL<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
           }
           echo "</td>";
