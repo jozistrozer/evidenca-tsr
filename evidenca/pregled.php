@@ -17,6 +17,15 @@ if ($vrsta_up == "dijak") {
     $predmeti = mysqli_fetch_all(mysqli_query($conn, "SELECT DISTINCT p.kratica, pr.predmet_id FROM predmet p, dijak d, predmet_razred pr WHERE d.razred_id = (SELECT razred_id FROM dijak WHERE username='$username') AND pr.predmet_id = p.predmet_id"));
 } else if ($vrsta_up == "profesor") {
     # PROFESOR
+    $osnovni_podatki = mysqli_query($conn, "SELECT ime, priimek, kabinet FROM profesor WHERE username='$username';");
+    
+    while ($vrstica = mysqli_fetch_assoc($osnovni_podatki)) {
+        $ime = $vrstica["ime"];
+        $priimek = $vrstica["priimek"];
+        $kabinet = $vrstica["kabinet"];
+    }
+    
+    $oddelek = "Matic more zrihtat sql";
     
 } else {
     header("Location: ../index.html");
@@ -50,30 +59,32 @@ if ($vrsta_up == "dijak") {
       <div class="container-fluid">
         <ul class="nav navbar-nav" id="postavkeList">
           <li><p>Redovalnica</p></li>
-          <li><p>TAB2</p></li>
-          <li><p>TAB3</p></li>
-          <li><p>TAB4</p></li>
         </ul>
-
         <ul class="nav navbar-nav" id="prijavljenNavbar">
           <li><p><span style="font-weight: bold;">Prijavljen uporabnik: </span><?php echo $ime . " " . $priimek; ?></p></li>
         </ul>
-
       </div>
     </div>
   </head>
   <body>
     <h4><span style="font-weight: bold;">Status: </span><?php echo ucfirst($vrsta_up); ?></h4>
-    <h4><span style="font-weight: bold;">Oddelek: </span><?php echo $oddelek; ?></h4>
-
-      <?php
+    
+    <?php
+      if ($vrsta_up == "profesor") {
+          echo "<h4><span style='font-weight: bold;'>Oddelek (razrednik): </span>Matic more zrihtat sql</h4>";
+          echo "<h4><span style='font-weight: bold;'>Kabinet: </span>$kabinet</h4>";
+      } else {
+          echo "<h4><span style='font-weight: bold;'>Oddelek: </span>$oddelek</h4>";
+      }
+    ?>
+      <?php  
         if ($vrsta_up == "dijak") {
             echo "<table class='table'>";
             echo "<thead>";
             echo "<tr>";
             echo "<th scope='col'>Predmet</th>";
-            echo "<th scope='col'>1. Ocenjevalno obdobje</th>";
-            echo "<th scope='col'>2. Ocenjevalno obdobje</th>";
+            echo "<th scope='col'>1. ocenjevalno obdobje</th>";
+            echo "<th scope='col'>2. ocenjevalno obdobje</th>";
             echo "<th scope='col'>Zaključena ocena</th>";
             echo "</tr>";
             echo "</thead>";
@@ -89,27 +100,34 @@ if ($vrsta_up == "dijak") {
           # 1. OCENJEVALNO OBDOBJE
           echo "<td>";
           while($ocena = mysqli_fetch_assoc($predmet_prvo)){
-              echo $ocena["ocena"] . " ";
+              $ocena_temp = $ocena["ocena"];
+              $vrstaOcene_temp = $ocena["vrsta_ocene"];
+              $komentar_temp = $ocena["komentar"];
+              
+              echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b> Matic, SQL<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
           }
           echo "</td>";
           # 2. OCENJEVALNO OBDOBJE
           echo "<td>";
           while($ocena = mysqli_fetch_assoc($predmet_drugo)){
-              echo $ocena["ocena"] . " ";
+              $ocena_temp = $ocena["ocena"];
+              echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b> Matic, SQL<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
           }
           echo "</td>";
           # ZAKLJUCENA
           echo "<td>";
           while($ocena = mysqli_fetch_assoc($predmet_zakljucena)){
-              echo $ocena["ocena"] . " ";
+              $ocena_temp = $ocena["ocena"];
+              echo "<b>$ocena_temp</b>";
           }
           echo "</td>";
           echo "</tr>";
-          
         } 
         echo "</tbody>";
         echo "</table>";
-    }
+        } else if ($vrsta_up == "profesor") {
+            echo "<h3>Predmeti</h3>";
+        }
         
       ?>
 

@@ -2,6 +2,30 @@
   margin-bottom: 0px;
 }
 
+.oblacek {
+  position: relative;
+  display: inline-block;
+}
+
+.oblacek .txtOblacek {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.oblacek:hover .txtOblacek {
+  visibility: visible;
+}
+
 #postavkeNavbar{
   min-height: 0px;
   background-color: #cccccc;

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gostitelj: 127.0.0.1
--- Čas nastanka: 15. sep 2020 ob 09.10
--- Različica strežnika: 10.4.14-MariaDB
--- Različica PHP: 7.4.10
+-- Čas nastanka: 21. sep 2020 ob 19.38
+-- Različica strežnika: 10.4.13-MariaDB
+-- Različica PHP: 7.4.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -65,11 +65,11 @@ CREATE TABLE `ocena` (
 --
 
 INSERT INTO `ocena` (`ocena_id`, `ocena`, `vrsta_ocene`, `komentar`, `obdobje`, `predmet_id`, `dijak_id`) VALUES
-(1, 5, 'pisna', NULL, 1, 1, 4),
-(2, 4, 'ustna', NULL, 1, 2, 4),
-(3, 4, 'pisna', NULL, 2, 2, 4),
-(4, 3, 'izdelek', NULL, 1, 1, 5),
-(5, 1, 'izdelek', NULL, 2, 2, 5),
+(1, 5, 'pisna', 'premalo učenja', 1, 1, 4),
+(2, 4, 'ustna', 'Zelo lep ustni zagovor, ampak malenkost pomanjkljivosti.', 1, 2, 4),
+(3, 4, 'pisna', 'Zelo dobra 4-ka.', 2, 2, 4),
+(4, 3, 'izdelek', 'Ni čisto v skladu z navodili, ampak na splošno v redu.', 1, 1, 5),
+(5, 1, 'izdelek', 'Seminarska naloga ni bila oddana.', 2, 2, 5),
 (6, 1, 'zakljucena', NULL, 3, 1, 5);
 
 -- --------------------------------------------------------
@@ -91,7 +91,8 @@ CREATE TABLE `predmet` (
 
 INSERT INTO `predmet` (`predmet_id`, `kratica`, `naziv_predmeta`, `profesor_id`) VALUES
 (1, 'NUP', 'Napredna uporaba podatkovnih baz', 1),
-(2, 'SMV', 'Stroka moderne vsebine', 1);
+(2, 'SMV', 'Stroka moderne vsebine', 1),
+(3, 'SLO', 'Slovenščina', 1);
 
 -- --------------------------------------------------------
 
@@ -133,7 +134,7 @@ CREATE TABLE `profesor` (
 --
 
 INSERT INTO `profesor` (`profesor_id`, `ime`, `priimek`, `kabinet`, `username`, `password`) VALUES
-(1, 'Nejc', 'Rehar', 'Anus', 'nefi', '12345678');
+(1, 'Nejc', 'Rehar', 'AE05', 'nefi', '12345678');
 
 -- --------------------------------------------------------
 
@@ -221,7 +222,7 @@ ALTER TABLE `ocena`
 -- AUTO_INCREMENT tabele `predmet`
 --
 ALTER TABLE `predmet`
-  MODIFY `predmet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `predmet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT tabele `predmet_razred`
