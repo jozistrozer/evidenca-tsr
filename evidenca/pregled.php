@@ -18,15 +18,15 @@ if ($vrsta_up == "dijak") {
 } else if ($vrsta_up == "profesor") {
     # PROFESOR
     $osnovni_podatki = mysqli_query($conn, "SELECT ime, priimek, kabinet FROM profesor WHERE username='$username';");
-    
+
     while ($vrstica = mysqli_fetch_assoc($osnovni_podatki)) {
         $ime = $vrstica["ime"];
         $priimek = $vrstica["priimek"];
         $kabinet = $vrstica["kabinet"];
     }
-    
+
     $oddelek = "Matic more zrihtat sql";
-    
+
 } else {
     header("Location: ../index.html");
 }
@@ -68,7 +68,7 @@ if ($vrsta_up == "dijak") {
   </head>
   <body>
     <h4><span style="font-weight: bold;">Status: </span><?php echo ucfirst($vrsta_up); ?></h4>
-    
+
     <?php
       if ($vrsta_up == "profesor") {
           echo "<h4><span style='font-weight: bold;'>Oddelek (razrednik): </span>Matic more zrihtat sql</h4>";
@@ -77,7 +77,7 @@ if ($vrsta_up == "dijak") {
           echo "<h4><span style='font-weight: bold;'>Oddelek: </span>$oddelek</h4>";
       }
     ?>
-      <?php  
+      <?php
         if ($vrsta_up == "dijak") {
             echo "<table class='table'>";
             echo "<thead>";
@@ -103,7 +103,7 @@ if ($vrsta_up == "dijak") {
               $ocena_temp = $ocena["ocena"];
               $vrstaOcene_temp = $ocena["vrsta_ocene"];
               $komentar_temp = $ocena["komentar"];
-              
+
               echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b> Matic, SQL<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
           }
           echo "</td>";
@@ -113,7 +113,7 @@ if ($vrsta_up == "dijak") {
               $ocena_temp = $ocena["ocena"];
               $vrstaOcene_temp = $ocena["vrsta_ocene"];
               $komentar_temp = $ocena["komentar"];
-              
+
               echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b> Matic, SQL<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
           }
           echo "</td>";
@@ -125,13 +125,26 @@ if ($vrsta_up == "dijak") {
           }
           echo "</td>";
           echo "</tr>";
-        } 
+        }
         echo "</tbody>";
         echo "</table>";
         } else if ($vrsta_up == "profesor") {
             echo "<h3>Predmeti</h3>";
+            $predmeti = mysqli_query($conn, "SELECT kratica, naziv_predmeta FROM predmet p WHERE p.profesor_id = (SELECT profesor_id FROM profesor WHERE username='$username')");
+            while ($predmet = mysqli_fetch_assoc($predmeti)) {
+                $predmetKratica = $predmet["kratica"];
+                echo "<a href='?p=$predmetKratica'>$predmetKratica</a>" . " " . $predmet["naziv_predmeta"] . "<br>";
+            }
+            if (isset($_GET["p"])) {
+              $izbranPredmet = $_GET["p"];
+              echo "<div class='izbranPredmet'>";
+              echo "<h4>$izbranPredmet</h4>";
+              echo "<h5>RAZRED</h5>";
+              echo "</div>";
+            }
+
         }
-        
+
       ?>
 
   </body>
