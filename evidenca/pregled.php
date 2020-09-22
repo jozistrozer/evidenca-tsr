@@ -137,16 +137,17 @@ if ($vrsta_up == "dijak") {
             }
             if (isset($_GET["p"])) {
               $izbranPredmet = $_GET["p"];
+              $razrediPredmet = mysqli_query($conn, "SELECT r.razred FROM predmet_razred pr JOIN razred r ON r.razred_id = pr.razred_id WHERE pr.predmet_id = (SELECT predmet_id FROM predmet WHERE kratica = '$izbranPredmet')");
               echo "<div class='izbranPredmet'>";
               echo "<h4>$izbranPredmet</h4>";
-              echo "<h5>RAZRED</h5>";
+              while ($razred = mysqli_fetch_assoc($razrediPredmet)) {
+                $tmpRazred = $razred["razred"];
+                echo "<h5>$tmpRazred</h5>";
+              }
               echo "</div>";
             }
-
         }
-
       ?>
-
   </body>
   <footer>
     <p>Evidenca - TSR</p>

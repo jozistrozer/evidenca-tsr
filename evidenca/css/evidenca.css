@@ -5,12 +5,14 @@
 .oblacek {
   position: relative;
   display: inline-block;
+  margin-right: 35px;
+
 }
 
 .oblacek .txtOblacek {
   visibility: hidden;
   width: 120px;
-  background-color: black;
+  background-color: rgb(34, 34, 34);
   color: #fff;
   text-align: left;
   border-radius: 6px;
