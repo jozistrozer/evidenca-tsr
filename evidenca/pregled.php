@@ -65,13 +65,41 @@ if ($vrsta_up == "dijak") {
         </ul>
       </div>
     </div>
+    <script>
+        function insertParam(key, value) {
+            key = encodeURIComponent(key);
+            value = encodeURIComponent(value);
+
+            // kvp looks like ['key1=value1', 'key2=value2', ...]
+            var kvp = document.location.search.substr(1).split('&');
+            let i=0;
+
+            for(; i<kvp.length; i++){
+                if (kvp[i].startsWith(key + '=')) {
+                    let pair = kvp[i].split('=');
+                    pair[1] = value;
+                    kvp[i] = pair.join('=');
+                    break;
+                }
+            }
+
+            if(i >= kvp.length){
+                kvp[kvp.length] = [key,value].join('=');
+            }
+
+            // can return this or...
+            let params = kvp.join('&');
+
+            // reload page with new params
+            document.location.search = params;
+        }  
+    </script>
   </head>
   <body>
     <h4><span style="font-weight: bold;">Status: </span><?php echo ucfirst($vrsta_up); ?></h4>
 
     <?php
       if ($vrsta_up == "profesor") {
-          echo "<h4><span style='font-weight: bold;'>Oddelek (razrednik): </span>Matic more zrihtat sql</h4>";
           echo "<h4><span style='font-weight: bold;'>Kabinet: </span>$kabinet</h4>";
       } else {
           echo "<h4><span style='font-weight: bold;'>Oddelek: </span>$oddelek</h4>";
@@ -92,19 +120,20 @@ if ($vrsta_up == "dijak") {
         for ($i = 0; $i < count($predmeti); $i++) {
           echo "<tr>";
           echo "<th scope='row'>" . $predmeti[$i][0] . "</th>";
-          $predmet_prvo = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 1");
+          $predmet_prvo = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje, datum FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 1");
 
-          $predmet_drugo = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 2");
+          $predmet_drugo = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje, datum FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 2");
 
-          $predmet_zakljucena = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 3");
+          $predmet_zakljucena = mysqli_query($conn, "SELECT ocena, vrsta_ocene, komentar, obdobje, datum FROM ocena o WHERE o.predmet_id = '".$predmeti[$i][1]."' AND o.dijak_id = (SELECT dijak_id FROM dijak WHERE username='$username') AND o.obdobje = 3");
           # 1. OCENJEVALNO OBDOBJE
           echo "<td>";
           while($ocena = mysqli_fetch_assoc($predmet_prvo)){
               $ocena_temp = $ocena["ocena"];
               $vrstaOcene_temp = $ocena["vrsta_ocene"];
               $komentar_temp = $ocena["komentar"];
+              $datumOcena = $ocena["datum"];
 
-              echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b> Matic, SQL<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
+              echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b>$datumOcena<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
           }
           echo "</td>";
           # 2. OCENJEVALNO OBDOBJE
@@ -113,8 +142,9 @@ if ($vrsta_up == "dijak") {
               $ocena_temp = $ocena["ocena"];
               $vrstaOcene_temp = $ocena["vrsta_ocene"];
               $komentar_temp = $ocena["komentar"];
+              $datumOcena = $ocena["datum"];
 
-              echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b> Matic, SQL<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
+              echo "<div class='oblacek'>$ocena_temp<span class='txtOblacek'><b>Datum: </b>$datumOcena<br><b>Vrsta ocene: </b>$vrstaOcene_temp<br><b>Komentar: </b>$komentar_temp<br></span></div>";
           }
           echo "</td>";
           # ZAKLJUCENA
@@ -139,17 +169,42 @@ if ($vrsta_up == "dijak") {
               $izbranPredmet = $_GET["p"];
               $razrediPredmet = mysqli_query($conn, "SELECT r.razred FROM predmet_razred pr JOIN razred r ON r.razred_id = pr.razred_id WHERE pr.predmet_id = (SELECT predmet_id FROM predmet WHERE kratica = '$izbranPredmet')");
               echo "<div class='izbranPredmet'>";
-              echo "<h4>$izbranPredmet</h4>";
+              echo "<h4 style='font-weight: bold;'>$izbranPredmet</h4>";
               while ($razred = mysqli_fetch_assoc($razrediPredmet)) {
                 $tmpRazred = $razred["razred"];
-                echo "<h5>$tmpRazred</h5>";
+                echo "<a onclick='insertParam(&quot;r&quot;, &quot;".$tmpRazred."&quot;)'>$tmpRazred</a><br>";
               }
               echo "</div>";
+              if (isset($_GET["r"])) {
+                 echo "<h1>". $_GET["r"] . "</h1>";
+                 $izbranRazred = $_GET["r"];
+                 $izbranPredmet = $_GET["p"];
+                  
+                 $sqlFirst = mysqli_query($conn, "SELECT * FROM dijak d JOIN razred r ON r.razred_id = d.razred_id WHERE r.razred='$izbranRazred' ORDER BY d.ime");
+                 echo "<table class='table'>";
+                 echo "<thead>";
+                 echo "<tr>";
+                 echo "<th scope='col'>Ime, priimek</th>";
+                 echo "<th scope='col'>1. ocenjevalno obdobje</th>";
+                 echo "<th scope='col'>2. ocenjevalno obdobje</th>";
+                 echo "<th scope='col'>Zaključena ocena</th>";
+                 echo "</tr>";
+                 echo "</thead>";
+                 echo "<tbody>";
+                 
+                 $count = 1;
+                 while ($imePriimek = mysqli_fetch_assoc($sqlFirst)) {
+                     echo "<tr>";
+                     echo "<th scope='col'> $count. " . $imePriimek["ime"] . " " . $imePriimek["priimek"] . "</th>";
+                     echo "<td></td>";
+                     echo "<td></td>";
+                     echo "</tr>";
+                     $count = $count + 1;
+                 }
+                 
+              }
             }
         }
       ?>
   </body>
-  <footer>
-    <p>Evidenca - TSR</p>
-  </footer>
 </html>
