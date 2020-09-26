@@ -70,7 +70,6 @@ if ($vrsta_up == "dijak") {
             key = encodeURIComponent(key);
             value = encodeURIComponent(value);
 
-            // kvp looks like ['key1=value1', 'key2=value2', ...]
             var kvp = document.location.search.substr(1).split('&');
             let i=0;
 
@@ -87,10 +86,8 @@ if ($vrsta_up == "dijak") {
                 kvp[kvp.length] = [key,value].join('=');
             }
 
-            // can return this or...
             let params = kvp.join('&');
 
-            // reload page with new params
             document.location.search = params;
         }  
     </script>
@@ -196,8 +193,40 @@ if ($vrsta_up == "dijak") {
                  while ($imePriimek = mysqli_fetch_assoc($sqlFirst)) {
                      echo "<tr>";
                      echo "<th scope='col'> $count. " . $imePriimek["ime"] . " " . $imePriimek["priimek"] . "</th>";
-                     echo "<td></td>";
-                     echo "<td></td>";
+                     echo "<td>";
+                     $sqlPrvoObdobje = mysqli_query($conn, "SELECT ocena FROM ocena o
+                     INNER JOIN dijak d ON d.dijak_id = o.dijak_id
+                     INNER JOIN predmet p ON p.predmet_id = o.predmet_id
+                     WHERE d.dijak_id = " . $imePriimek["dijak_id"] . "
+                     AND p.kratica = '" . $izbranPredmet . "'
+                     AND o.obdobje = 1");
+                     while ($ocena = mysqli_fetch_assoc($sqlPrvoObdobje)) {
+                         echo $ocena["ocena"] . " ";
+                     }
+                     echo "</td>";
+                     
+                     echo "<td>";
+                     $sqlDrugoObdobje = mysqli_query($conn, "SELECT ocena FROM ocena o
+                     INNER JOIN dijak d ON d.dijak_id = o.dijak_id
+                     INNER JOIN predmet p ON p.predmet_id = o.predmet_id
+                     WHERE d.dijak_id = " . $imePriimek["dijak_id"] . "
+                     AND p.kratica = '" . $izbranPredmet . "'
+                     AND o.obdobje = 2");
+                     while ($ocena = mysqli_fetch_assoc($sqlDrugoObdobje)) {
+                         echo $ocena["ocena"] . " ";
+                     }
+                     echo "</td>";
+                     echo "<td>";
+                     $sqlZakljucnaOcena = mysqli_query($conn, "SELECT ocena FROM ocena o
+                     INNER JOIN dijak d ON d.dijak_id = o.dijak_id
+                     INNER JOIN predmet p ON p.predmet_id = o.predmet_id
+                     WHERE d.dijak_id = " . $imePriimek["dijak_id"] . "
+                     AND p.kratica = '" . $izbranPredmet . "'
+                     AND o.obdobje = 3");
+                     while ($ocena = mysqli_fetch_assoc($sqlZakljucnaOcena)) {
+                         echo $ocena["ocena"] . " ";
+                     }
+                     echo "</td>";
                      echo "</tr>";
                      $count = $count + 1;
                  }
