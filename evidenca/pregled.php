@@ -201,10 +201,10 @@ if ($vrsta_up == "dijak") {
                      AND p.kratica = '" . $izbranPredmet . "'
                      AND o.obdobje = 1");
                      while ($ocena = mysqli_fetch_assoc($sqlPrvoObdobje)) {
-                         echo $ocena["ocena"] . " ";
+                         echo "<span style='margin-right:35px;'>" . $ocena["ocena"] . "</span>";
                      }
+                     echo "<input type='text' id='addGrade'>";
                      echo "</td>";
-                     
                      echo "<td>";
                      $sqlDrugoObdobje = mysqli_query($conn, "SELECT ocena FROM ocena o
                      INNER JOIN dijak d ON d.dijak_id = o.dijak_id
@@ -213,8 +213,9 @@ if ($vrsta_up == "dijak") {
                      AND p.kratica = '" . $izbranPredmet . "'
                      AND o.obdobje = 2");
                      while ($ocena = mysqli_fetch_assoc($sqlDrugoObdobje)) {
-                         echo $ocena["ocena"] . " ";
+                         echo "<span style='margin-right:35px;'>" . $ocena["ocena"] . "</span>";
                      }
+                     echo "<input type='text' id='addGrade'>";
                      echo "</td>";
                      echo "<td>";
                      $sqlZakljucnaOcena = mysqli_query($conn, "SELECT ocena FROM ocena o
@@ -224,13 +225,13 @@ if ($vrsta_up == "dijak") {
                      AND p.kratica = '" . $izbranPredmet . "'
                      AND o.obdobje = 3");
                      while ($ocena = mysqli_fetch_assoc($sqlZakljucnaOcena)) {
-                         echo $ocena["ocena"] . " ";
+                         echo $ocena["ocena"];
                      }
+                     echo "<input type='text' id='addGrade'>";
                      echo "</td>";
                      echo "</tr>";
                      $count = $count + 1;
                  }
-                 
               }
             }
         }

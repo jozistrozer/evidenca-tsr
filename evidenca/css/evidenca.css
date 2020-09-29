@@ -47,3 +47,9 @@
   margin-right: 25px;
   margin-top: 5px;
 }
+
+#addGrade {
+    width: 15px;
+    height: 20px;
+    border: 1px solid rgb(200, 200, 200);
+}
