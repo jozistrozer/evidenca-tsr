@@ -48,8 +48,29 @@
   margin-top: 5px;
 }
 
-#addGrade {
-    width: 15px;
-    height: 20px;
-    border: 1px solid rgb(200, 200, 200);
+.addGrade {
+    font-size: 20px;
+    color: grey;
+}
+
+.addGrade:hover{
+    font-weight:bold;
+    cursor: pointer;
+    color: black;
+}
+
+#ocena:hover {
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#tabela{
+    display: grid;
+    grid-template-columns: 15% 15%;
+}
+
+textarea{
+    max-width: 250px;
+    max-height: 250px;
 }

@@ -40,6 +40,7 @@ if ($vrsta_up == "dijak") {
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="css/evidenca.css">
+    <link rel="stylesheet" href="css/modal.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="js/odjava.js" charset="utf-8"></script>
@@ -66,6 +67,7 @@ if ($vrsta_up == "dijak") {
       </div>
     </div>
     <script>
+        // Za URL parametre
         function insertParam(key, value) {
             key = encodeURIComponent(key);
             value = encodeURIComponent(value);
@@ -89,7 +91,54 @@ if ($vrsta_up == "dijak") {
             let params = kvp.join('&');
 
             document.location.search = params;
-        }  
+        } 
+        
+        $(document).ready(function(){
+            $("#dodajOcenoForm").submit(function(event){
+                event.preventDefault();    
+                
+                var ocena = $("#formOcena").val();
+                var komentar = $("#formKomentar").val();
+                var dijak_id = $("#idD_ocena").val();
+                alert(ocena + " " + komentar + " " + dijak_id);
+                
+                // ajax request za dodajanje ocene.
+                $.ajax({
+                  type: "POST",
+                  url: "php/dodaj_oceno.php",
+                  data:{ocena:ocena, komentar:komentar, dijak_id:dijak_id},
+                  success: function(data){
+                      if (data == 1){
+                          alert("Ocena je bila uspešno dodana.");
+                      } else {
+                          alert("Napaka pri dodajanju ocene, poskusi ponovno.");
+                      }
+                      // reload strani
+                      location.reload();
+                  }
+                });
+        
+            });
+        });
+   
+        function IzbrisiOceno (ocena_id){
+            // ajax request za brisanje ocene.
+            $.ajax({
+              type: "POST",
+              url: "php/izbrisi_oceno.php",
+              data:{ocena_id:ocena_id},
+              success: function(data){
+                  if (data == 1){
+                      alert("Ocena je bila uspešno izbrisana.");
+                  } else {
+                      alert("Napaka pri brisanju ocene, poskusi ponovno.");
+                  }
+                  // reload strani.
+                  location.reload();
+              }
+          });
+        }
+        
     </script>
   </head>
   <body>
@@ -194,47 +243,81 @@ if ($vrsta_up == "dijak") {
                      echo "<tr>";
                      echo "<th scope='col'> $count. " . $imePriimek["ime"] . " " . $imePriimek["priimek"] . "</th>";
                      echo "<td>";
-                     $sqlPrvoObdobje = mysqli_query($conn, "SELECT ocena FROM ocena o
+                     $sqlPrvoObdobje = mysqli_query($conn, "SELECT ocena_id, ocena FROM ocena o
                      INNER JOIN dijak d ON d.dijak_id = o.dijak_id
                      INNER JOIN predmet p ON p.predmet_id = o.predmet_id
                      WHERE d.dijak_id = " . $imePriimek["dijak_id"] . "
                      AND p.kratica = '" . $izbranPredmet . "'
                      AND o.obdobje = 1");
                      while ($ocena = mysqli_fetch_assoc($sqlPrvoObdobje)) {
-                         echo "<span style='margin-right:35px;'>" . $ocena["ocena"] . "</span>";
+                         echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
-                     echo "<input type='text' id='addGrade'>";
+                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;)'>+</span>";
                      echo "</td>";
                      echo "<td>";
-                     $sqlDrugoObdobje = mysqli_query($conn, "SELECT ocena FROM ocena o
+                     $sqlDrugoObdobje = mysqli_query($conn, "SELECT ocena_id, ocena FROM ocena o
                      INNER JOIN dijak d ON d.dijak_id = o.dijak_id
                      INNER JOIN predmet p ON p.predmet_id = o.predmet_id
                      WHERE d.dijak_id = " . $imePriimek["dijak_id"] . "
                      AND p.kratica = '" . $izbranPredmet . "'
                      AND o.obdobje = 2");
+                     
                      while ($ocena = mysqli_fetch_assoc($sqlDrugoObdobje)) {
-                         echo "<span style='margin-right:35px;'>" . $ocena["ocena"] . "</span>";
+                         echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
-                     echo "<input type='text' id='addGrade'>";
+                     
+                     echo "<input type='number' id='". $imePriimek["dijak_id"] ."' min='1' max='5' class='addGrade'>";
                      echo "</td>";
                      echo "<td>";
-                     $sqlZakljucnaOcena = mysqli_query($conn, "SELECT ocena FROM ocena o
+                     $sqlZakljucnaOcena = mysqli_query($conn, "SELECT ocena_id, ocena FROM ocena o
                      INNER JOIN dijak d ON d.dijak_id = o.dijak_id
                      INNER JOIN predmet p ON p.predmet_id = o.predmet_id
                      WHERE d.dijak_id = " . $imePriimek["dijak_id"] . "
                      AND p.kratica = '" . $izbranPredmet . "'
                      AND o.obdobje = 3");
                      while ($ocena = mysqli_fetch_assoc($sqlZakljucnaOcena)) {
-                         echo $ocena["ocena"];
+                         echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
-                     echo "<input type='text' id='addGrade'>";
+                     echo "<input type='number' id='". $imePriimek["dijak_id"] ."' min='1' max='5' class='addGrade'>";
                      echo "</td>";
                      echo "</tr>";
                      $count = $count + 1;
                  }
+                echo "<div id='addGradeModal' class='modal'>";
+                    echo "<div class='modal-content'>";
+                        echo "<span class='close'>&times;</span>";
+                        echo "<p style='font-weight:bold;'>Dodaj oceno</p>";
+                        echo "<form type='POST' id='dodajOcenoForm'>";
+                        echo "<div id='tabela'>";
+                            echo "<div id='tabela-leva'>";
+                            echo "<p style='visibility:hidden;' id='idD_ocena'></p>";
+                            echo "<p>Ocena:</p>";
+                            echo "<p>Komentar:</p>";
+                            echo "<p>Vrsta ocene:</p>";
+                            echo "</div>";
+                            echo "<div id='tabela-desna'>";
+                            echo "<input type='number' min='1' max='5' id='formOcena'>";
+                            echo "<textarea id='formKomentar'></textarea>";
+                            echo "<select id='vrstaOceneDropdown'>";
+                                echo "<option value='pisna'>Pisna ocena</option>";
+                                echo "<option value='ustna'>Ustna ocena</option>";
+                            echo "</select>";
+                            echo "<input type='submit'>";
+                            echo "</div>";
+                        echo "</div>";
+                        echo "</form>";
+                    echo "</div>";
+                echo "</div>";
               }
             }
         }
       ?>
   </body>
+    <script>
+        function OdpriModalno(dijak_id){
+            modal.style.display = "block";
+            $("#idD_ocena").val(dijak_id);
+        }
+    </script>
+    <script src="js/modal.js" charset="utf-8"></script>
 </html>

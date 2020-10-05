@@ -25,7 +25,6 @@ $(document).ready(function(){
           url: "php_handle/prijavi.php",
           data:{username:username, password:password},
           success: function(data){
-            console.log(data);
             if (data == 1) {
               window.location.href = 'evidenca/pregled.php';
             } else {
