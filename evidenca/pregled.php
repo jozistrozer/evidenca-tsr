@@ -100,21 +100,24 @@ if ($vrsta_up == "dijak") {
                 var ocena = $("#formOcena").val();
                 var komentar = $("#formKomentar").val();
                 var dijak_id = $("#idD_ocena").val();
-                alert(ocena + " " + komentar + " " + dijak_id);
+                var vrsta_ocene = $("#txtVrstaOcene").val();
+                var obdobje = $("#idD_obdobje").val();
+                var predmet_id = $("#idD_predmetID").val();
                 
                 // ajax request za dodajanje ocene.
                 $.ajax({
                   type: "POST",
                   url: "php/dodaj_oceno.php",
-                  data:{ocena:ocena, komentar:komentar, dijak_id:dijak_id},
+                  data:{ocena:ocena, komentar:komentar, dijak_id:dijak_id, vrsta_ocene:vrsta_ocene, obdobje:obdobje, predmet_id:predmet_id},
                   success: function(data){
-                      if (data == 1){
+                      /*if (data == 1){
                           alert("Ocena je bila uspešno dodana.");
                       } else {
                           alert("Napaka pri dodajanju ocene, poskusi ponovno.");
-                      }
+                      }*/
                       // reload strani
-                      location.reload();
+                      console.log(data);
+                     // location.reload();
                   }
                 });
         
@@ -243,7 +246,7 @@ if ($vrsta_up == "dijak") {
                      echo "<tr>";
                      echo "<th scope='col'> $count. " . $imePriimek["ime"] . " " . $imePriimek["priimek"] . "</th>";
                      echo "<td>";
-                     $sqlPrvoObdobje = mysqli_query($conn, "SELECT ocena_id, ocena FROM ocena o
+                     $sqlPrvoObdobje = mysqli_query($conn, "SELECT ocena_id, ocena, obdobje FROM ocena o
                      INNER JOIN dijak d ON d.dijak_id = o.dijak_id
                      INNER JOIN predmet p ON p.predmet_id = o.predmet_id
                      WHERE d.dijak_id = " . $imePriimek["dijak_id"] . "
@@ -252,9 +255,10 @@ if ($vrsta_up == "dijak") {
                      while ($ocena = mysqli_fetch_assoc($sqlPrvoObdobje)) {
                          echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
-                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;)'>+</span>";
+                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;1&quot;, &quot;".$izbranPredmet."&quot;)'>+</span>";
                      echo "</td>";
                      echo "<td>";
+                     
                      $sqlDrugoObdobje = mysqli_query($conn, "SELECT ocena_id, ocena FROM ocena o
                      INNER JOIN dijak d ON d.dijak_id = o.dijak_id
                      INNER JOIN predmet p ON p.predmet_id = o.predmet_id
@@ -266,7 +270,7 @@ if ($vrsta_up == "dijak") {
                          echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
                      
-                     echo "<input type='number' id='". $imePriimek["dijak_id"] ."' min='1' max='5' class='addGrade'>";
+                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;2&quot;)'>+</span>";
                      echo "</td>";
                      echo "<td>";
                      $sqlZakljucnaOcena = mysqli_query($conn, "SELECT ocena_id, ocena FROM ocena o
@@ -278,7 +282,7 @@ if ($vrsta_up == "dijak") {
                      while ($ocena = mysqli_fetch_assoc($sqlZakljucnaOcena)) {
                          echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
-                     echo "<input type='number' id='". $imePriimek["dijak_id"] ."' min='1' max='5' class='addGrade'>";
+                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;3&quot;)'>+</span>";
                      echo "</td>";
                      echo "</tr>";
                      $count = $count + 1;
@@ -290,10 +294,14 @@ if ($vrsta_up == "dijak") {
                         echo "<form type='POST' id='dodajOcenoForm'>";
                         echo "<div id='tabela'>";
                             echo "<div id='tabela-leva'>";
-                            echo "<p style='visibility:hidden;' id='idD_ocena'></p>";
+                  
+                            echo "<p style='display:block;' id='idD_ocena'></p>";
+                            echo "<p style='display:block; id='idD_obdobje'></p>";
+                            echo "<p style='display:block; id='idD_predmetID'></p>";
+                  
                             echo "<p>Ocena:</p>";
-                            echo "<p>Komentar:</p>";
-                            echo "<p>Vrsta ocene:</p>";
+                            echo "<p id='txtKomentar'>Komentar:</p><br>";
+                            echo "<p id='txtVrstaOcene'>Vrsta ocene:</p>";
                             echo "</div>";
                             echo "<div id='tabela-desna'>";
                             echo "<input type='number' min='1' max='5' id='formOcena'>";
@@ -301,6 +309,7 @@ if ($vrsta_up == "dijak") {
                             echo "<select id='vrstaOceneDropdown'>";
                                 echo "<option value='pisna'>Pisna ocena</option>";
                                 echo "<option value='ustna'>Ustna ocena</option>";
+                                echo "<option value='izdelek'>Izdelek</option>";
                             echo "</select>";
                             echo "<input type='submit'>";
                             echo "</div>";
@@ -314,9 +323,38 @@ if ($vrsta_up == "dijak") {
       ?>
   </body>
     <script>
-        function OdpriModalno(dijak_id){
+        function OdpriModalno(dijak_id, obdobje, predmet_id){
             modal.style.display = "block";
             $("#idD_ocena").val(dijak_id);
+            $("#idD_obdobje").val(obdobje);
+            $("#idD_predmetID").val(predmet_id);
+            
+            $("#idD_ocena").html(dijak_id);
+            $("#idD_obdobje").html(obdobje);
+            $("#idD_predmetID").html(predmet_id);
+            
+            console.log("dijak_id: " + dijak_id + " obdobje: " + obdobje + " predmet_id: " + predmet_id);
+            
+            console.log($("#idD_ocena").val());
+            console.log($("#idD_obdobje").val());
+            console.log($("#idD_predmetID").val());
+            if (obdobje == 3) {
+                // vrsta ocene
+                document.getElementById("vrstaOceneDropdown").style.display = "none";
+                document.getElementById("txtVrstaOcene").style.display = "none";
+                
+                //komentar
+                document.getElementById("formKomentar").style.display = "none";
+                document.getElementById("txtKomentar").style.display = "none";
+            } else {
+                // vrsta ocene
+                document.getElementById("vrstaOceneDropdown").style.display = "inline";
+                document.getElementById("txtVrstaOcene").style.display = "inline";
+                
+                //komentar
+                document.getElementById("formKomentar").style.display = "inline";
+                document.getElementById("txtKomentar").style.display = "inline";
+            }
         }
     </script>
     <script src="js/modal.js" charset="utf-8"></script>
