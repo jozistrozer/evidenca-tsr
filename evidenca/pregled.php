@@ -99,10 +99,10 @@ if ($vrsta_up == "dijak") {
                 
                 var ocena = $("#formOcena").val();
                 var komentar = $("#formKomentar").val();
-                var dijak_id = $("#idD_ocena").val();
-                var vrsta_ocene = $("#txtVrstaOcene").val();
-                var obdobje = $("#idD_obdobje").val();
-                var predmet_id = $("#idD_predmetID").val();
+                var dijak_id = $("#idDijakID").val();
+                var vrsta_ocene = $("#vrstaOceneDropdown").val();
+                var obdobje = $("#idObdobje").val();
+                var predmet_id = $("#idPredmet").val();
                 
                 // ajax request za dodajanje ocene.
                 $.ajax({
@@ -110,14 +110,13 @@ if ($vrsta_up == "dijak") {
                   url: "php/dodaj_oceno.php",
                   data:{ocena:ocena, komentar:komentar, dijak_id:dijak_id, vrsta_ocene:vrsta_ocene, obdobje:obdobje, predmet_id:predmet_id},
                   success: function(data){
-                      /*if (data == 1){
+                      if (data == 1){
                           alert("Ocena je bila uspešno dodana.");
                       } else {
                           alert("Napaka pri dodajanju ocene, poskusi ponovno.");
-                      }*/
+                      }
                       // reload strani
-                      console.log(data);
-                     // location.reload();
+                      location.reload();
                   }
                 });
         
@@ -270,7 +269,7 @@ if ($vrsta_up == "dijak") {
                          echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
                      
-                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;2&quot;)'>+</span>";
+                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;2&quot;, &quot;".$izbranPredmet."&quot;)'>+</span>";
                      echo "</td>";
                      echo "<td>";
                      $sqlZakljucnaOcena = mysqli_query($conn, "SELECT ocena_id, ocena FROM ocena o
@@ -282,7 +281,7 @@ if ($vrsta_up == "dijak") {
                      while ($ocena = mysqli_fetch_assoc($sqlZakljucnaOcena)) {
                          echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
-                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;3&quot;)'>+</span>";
+                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;3&quot;, &quot;".$izbranPredmet."&quot;)'>+</span>";
                      echo "</td>";
                      echo "</tr>";
                      $count = $count + 1;
@@ -295,9 +294,10 @@ if ($vrsta_up == "dijak") {
                         echo "<div id='tabela'>";
                             echo "<div id='tabela-leva'>";
                   
-                            echo "<p style='display:block;' id='idD_ocena'></p>";
-                            echo "<p style='display:block; id='idD_obdobje'></p>";
-                            echo "<p style='display:block; id='idD_predmetID'></p>";
+                            echo "<span id='idDijakID'></span>";
+                            echo "<span id='idPredmet'></span>";
+                            echo "<span id='idObdobje'></span>";
+                                
                   
                             echo "<p>Ocena:</p>";
                             echo "<p id='txtKomentar'>Komentar:</p><br>";
@@ -325,19 +325,11 @@ if ($vrsta_up == "dijak") {
     <script>
         function OdpriModalno(dijak_id, obdobje, predmet_id){
             modal.style.display = "block";
-            $("#idD_ocena").val(dijak_id);
-            $("#idD_obdobje").val(obdobje);
-            $("#idD_predmetID").val(predmet_id);
             
-            $("#idD_ocena").html(dijak_id);
-            $("#idD_obdobje").html(obdobje);
-            $("#idD_predmetID").html(predmet_id);
+            $("#idDijakID").val(dijak_id);
+            $("#idObdobje").val(obdobje);
+            $("#idPredmet").val(predmet_id);
             
-            console.log("dijak_id: " + dijak_id + " obdobje: " + obdobje + " predmet_id: " + predmet_id);
-            
-            console.log($("#idD_ocena").val());
-            console.log($("#idD_obdobje").val());
-            console.log($("#idD_predmetID").val());
             if (obdobje == 3) {
                 // vrsta ocene
                 document.getElementById("vrstaOceneDropdown").style.display = "none";
