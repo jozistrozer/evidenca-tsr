@@ -281,7 +281,10 @@ if ($vrsta_up == "dijak") {
                      while ($ocena = mysqli_fetch_assoc($sqlZakljucnaOcena)) {
                          echo "<span style='margin-right:35px;' id='ocena' onclick='IzbrisiOceno(&quot;".$ocena["ocena_id"]."&quot;)'>" . $ocena["ocena"] . "</span>";
                      }
-                     echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;3&quot;, &quot;".$izbranPredmet."&quot;)'>+</span>";
+                     if (mysqli_num_rows($sqlZakljucnaOcena) < 1){
+                        echo "<span id='". $imePriimek["dijak_id"] ."' class='addGrade' onclick='OdpriModalno(&quot;". $imePriimek["dijak_id"] ."&quot;, &quot;3&quot;, &quot;".$izbranPredmet."&quot;)'>+</span>"; 
+                     }
+                     
                      echo "</td>";
                      echo "</tr>";
                      $count = $count + 1;
